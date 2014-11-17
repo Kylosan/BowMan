@@ -60,13 +60,7 @@ public class GLRenderer implements Renderer {
     	
     	// We should make sure we are valid and sane
     	if (mLastTime > now) return;
-        
-    	// Get the amount of time the last frame took.
-    	long elapsed = now - mLastTime;
-		
-		// Update our example
-		
-		// Render our example
+
 		Render(mtrxProjectionAndView);
 		
 		// Save the current time to see how long it took :).
@@ -97,6 +91,7 @@ public class GLRenderer implements Renderer {
         GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
 
         // Draw the triangle
+        
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
                 GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
@@ -141,8 +136,8 @@ public class GLRenderer implements Renderer {
 		// Create the triangle
 		SetupTriangle();
 		
-		// Set the clear color to black
-		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1);	
+		// Set the clear color to gray
+		GLES20.glClearColor(0.8f, 0.8f, 0.8f, 1);	
 
 	    // Create the shaders
 	    int vertexShader = riGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER, riGraphicTools.vs_SolidColor);
@@ -159,14 +154,15 @@ public class GLRenderer implements Renderer {
 	
 	public void SetupTriangle()
 	{
-		// We have to create the vertices of our triangle.
+		//the vertices of triangle. It is square now.
 		vertices = new float[]
-		           {10.0f, 200f, 0.0f,
-					10.0f, 100f, 0.0f,
-					100f, 100f, 0.0f,
+		           {150f, 250f, 0.0f,
+					150f, 150f, 0.0f,
+					250f, 150f, 0.0f,
+					250.0f, 250f, 0.0f,
 		           };
 		
-		indices = new short[] {0, 1, 2}; // The order of vertexrendering.
+		indices = new short[] {0, 1, 2, 0, 3, 2}; // The order of vertex rendering.
 
 		// The vertex buffer.
 		ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
