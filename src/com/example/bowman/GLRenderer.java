@@ -79,10 +79,13 @@ public class GLRenderer implements Renderer {
 	    // Enable generic vertex attribute array
 	    GLES20.glEnableVertexAttribArray(mPositionHandle);
 
-	    // Prepare the triangle coordinate data
+	    // Prepare the boots coordinate data
 	    GLES20.glVertexAttribPointer(mPositionHandle, 3,
 	                                 GLES20.GL_FLOAT, false,
 	                                 0, vertexBuffer);
+	 
+	    
+	    
 	    
 	    // Get handle to shape's transformation matrix
         int mtrxhandle = GLES20.glGetUniformLocation(riGraphicTools.sp_SolidColor, "uMVPMatrix");
@@ -90,10 +93,11 @@ public class GLRenderer implements Renderer {
         // Apply the projection and view transformation
         GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
 
-        // Draw the triangle
+        // Draw 
         
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.length,
                 GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+        
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
@@ -134,7 +138,8 @@ public class GLRenderer implements Renderer {
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		
 		// Create the triangle
-		SetupTriangle();
+		Setupboots();
+		
 		
 		// Set the clear color to gray
 		GLES20.glClearColor(0.8f, 0.8f, 0.8f, 1);	
@@ -152,17 +157,31 @@ public class GLRenderer implements Renderer {
 		GLES20.glUseProgram(riGraphicTools.sp_SolidColor);
 	}
 	
-	public void SetupTriangle()
+	public void Setupboots()
 	{
 		//the vertices of triangle. It is square now.
 		vertices = new float[]
-		           {150f, 250f, 0.0f,
-					150f, 150f, 0.0f,
-					250f, 150f, 0.0f,
-					250.0f, 250f, 0.0f,
+		           {//XXX   YYYY  ZZZZ
+					100.0f, 0.0f, 0.0f, 	//0
+					150.0f, 0.0f, 0.0f,		//1
+					100.0f, 30.0f, 0.0f,	//2
+					250.0f, 0.0f, 0.0f,		//3
+					300.0f, 0.0f, 0.0f,		//4
+					250.0f, 30.0f, 0.0f,	//5
+					175.0f, 100.0f, 0.0f,	//6
+					150.0f, 120.0f, 0.0f,	//7
+					200.0f, 120.0f, 0.0f,	//8
+					175.0f, 200.0f, 0.0f,	//9
+					150.0f, 250.0f, 0.0f,	//10
+					200.0f, 250.0f, 0.0f,	//11
+					100.0f, 250.0f, 0.0f,	//12
+					250.0f, 250.0f, 0.0f,	//13
+					175.0f, 300.0f, 0.0f	//14
+					//^ body!!!
+					
 		           };
 		
-		indices = new short[] {0, 1, 2, 0, 3, 2}; // The order of vertex rendering.
+		indices = new short[] {0, 1, 2,3,4,5,2,6,7,7,6,8,6,5,8,7,8,9,9,11,10,12,13,14}; // The order of vertex rendering.
 
 		// The vertex buffer.
 		ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
@@ -177,7 +196,6 @@ public class GLRenderer implements Renderer {
 		drawListBuffer = dlb.asShortBuffer();
 		drawListBuffer.put(indices);
 		drawListBuffer.position(0);
-		
-		
 	}
+	
 }
