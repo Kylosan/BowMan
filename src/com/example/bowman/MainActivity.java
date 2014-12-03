@@ -1,53 +1,105 @@
 package com.example.bowman;
 
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.app.Activity;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.RelativeLayout;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.pm.ConfigurationInfo;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 public class MainActivity extends Activity {
 
-	// Our OpenGL Surfaceview
-	private GLSurfaceView glSurfaceView;
+	/** Hold a reference to our GLSurfaceView */
+	private GLSurf mGLSurfaceView;
+	private GLRenderer mRenderer;
+	
+	private static final int MIN_DIALOG = 1;
+	private static final int MAG_DIALOG = 2;
+	
+	private int mMinSetting = -1;
+	private int mMagSetting = -1;
+	
+	private static final String MIN_SETTING = "min_setting";
+	private static final String MAG_SETTING = "mag_setting";
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		
-		// Turn off the window's title bar
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        
-        // Super
+	public void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		
-		// Fullscreen mode
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        
-        // We create our Surfaceview for our OpenGL here.
-        glSurfaceView = new GLSurf(this);
-        
-        // Set our view.	
 		setContentView(R.layout.activity_main);
+
+		mGLSurfaceView = (GLSurf)findViewById(R.id.gl_surface_view);
+
+		// Check if the system supports OpenGL ES 2.0.
+		final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+		final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
+
+		if (supportsEs2) 
+		{
+			// Request an OpenGL ES 2.0 compatible context.
+			mGLSurfaceView.setEGLContextClientVersion(2);
+			
+			final DisplayMetrics displayMetrics = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+			// Set the renderer to our demo renderer, defined below.
+			mRenderer = new GLRenderer(this);
+			mGLSurfaceView.setRenderer(mRenderer, displayMetrics.density);					
+		} 
+		else 
+		{
+			// This is where you could create an OpenGL ES 1.x compatible
+			// renderer if you wanted to support both ES 1 and ES 2.
+			return;
+		}
 		
-		// Retrieve our Relative layout from our main layout we just set to our view.
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.gamelayout);
-        
-        // Attach our surfaceview to our relative layout from our main layout.
-        RelativeLayout.LayoutParams glParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        layout.addView(glSurfaceView, glParams);
+		findViewById(R.id.button_set_fire).setOnClickListener(new OnClickListener() 
+		{		
+			@Override
+			public void onClick(View v) 
+			{
+				showDialog(MIN_DIALOG);				
+			}
+		});
+		
+		// Restore previous settings
+		if (savedInstanceState != null)
+		{
+		//????????
+		}
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		glSurfaceView.onPause();
-	}
-
-	@Override
-	protected void onResume() {
+	protected void onResume() 
+	{
+		// The activity must call the GL surface view's onResume() on activity
+		// onResume().
 		super.onResume();
-		glSurfaceView.onResume();
+		mGLSurfaceView.onResume();
 	}
 
+	@Override
+	protected void onPause() 
+	{
+		// The activity must call the GL surface view's onPause() on activity
+		// onPause().
+		super.onPause();
+		mGLSurfaceView.onPause();
+	}
+	
+	@Override
+	protected void onSaveInstanceState (Bundle outState)
+	{
+		outState.putInt(MIN_SETTING, mMinSetting);
+		outState.putInt(MAG_SETTING, mMagSetting);
+	}
+	
+	
+	
+	
+	
 }

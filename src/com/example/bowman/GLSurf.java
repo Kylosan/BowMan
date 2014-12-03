@@ -2,37 +2,65 @@ package com.example.bowman;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
 
 public class GLSurf extends GLSurfaceView {
 
-	private final GLRenderer mRenderer;
+private GLRenderer mRenderer;
 	
-	public GLSurf(Context context) {
-        super(context);
-
-        // Create an OpenGL ES 2.0 context.
-        setEGLContextClientVersion(2);
-
-        // Set the Renderer for drawing on the GLSurfaceView
-        mRenderer = new GLRenderer(context);
-        setRenderer(mRenderer);
-
-        // Render the view only when there is a change in the drawing data
-        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-    }
-
-	@Override
-	public void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-		mRenderer.onPause();
+	// Offsets for touch events	 
+    private float mPreviousX;
+    private float mPreviousY;
+    
+    private float mDensity;
+        	
+	public GLSurf(Context context) 
+	{
+		super(context);		
+	}
+	
+	public GLSurf(Context context, AttributeSet attrs) 
+	{
+		super(context, attrs);		
 	}
 
 	@Override
-	public void onResume() {
-		// TODO Auto-generated method stub
-		super.onResume();
-		mRenderer.onResume();
+	public boolean onTouchEvent(MotionEvent event) 
+	{
+		if (event != null)
+		{			
+			float x = event.getX();
+			float y = event.getY();
+			
+			if (event.getAction() == MotionEvent.ACTION_MOVE)
+			{
+				if (mRenderer != null)
+				{
+					float deltaX = (x - mPreviousX) / mDensity / 2f;
+					float deltaY = (y - mPreviousY) / mDensity / 2f;
+					
+					mRenderer.mDeltaX += deltaX;
+					mRenderer.mDeltaY += deltaY;												
+				}
+			}	
+			
+			mPreviousX = x;
+			mPreviousY = y;
+			
+			return true;
+		}
+		else
+		{
+			return super.onTouchEvent(event);
+		}		
 	}
 
+	// Hides superclass method.
+	public void setRenderer(GLRenderer renderer, float density) 
+	{
+		mRenderer = renderer;
+		mDensity = density;
+		super.setRenderer(renderer);
+	}
 }
